@@ -18,11 +18,15 @@ describe("Trello", function () {
       new Trello("APIKEY").should.be.ok;
     });
 
-    it("should set key and token properties", function () {
-      var trello = new Trello("APIKEY", "USERTOKEN");
+    it("should set key, token, and requestOptions properties", function () {
+      var apiKey = "APIKEY",
+        userToken = "USERTOKEN",
+        requestOptions = {option: "OPTION"};
+      var trello = new Trello(apiKey, userToken, requestOptions);
 
-      trello.key.should.equal("APIKEY");
-      trello.token.should.equal("USERTOKEN");
+      trello.key.should.equal(apiKey);
+      trello.token.should.equal(userToken);
+      trello.requestOptions.should.equal(requestOptions);
     });
   });
 
@@ -53,7 +57,13 @@ describe("Trello", function () {
         return new events.EventEmitter();
       }.bind(this);
 
-      this.trello = new Trello("APIKEY", "USERTOKEN");
+      this.requestOptions = {
+        headers: {
+          'User-Agent': 'request'
+        }
+      };
+
+      this.trello = new Trello("APIKEY", "USERTOKEN", this.requestOptions);
     });
 
     describe("#get()", function () {
@@ -178,6 +188,10 @@ describe("Trello", function () {
 
       it("should make a request with any method specified", function () {
         this.request.options.method.should.equal("VERB");
+      });
+
+      it("should include requestOptions on a request", function () {
+        this.request.options.should.containDeep(this.requestOptions);
       });
 
       it("should allow uris with a leading slash", function () {
